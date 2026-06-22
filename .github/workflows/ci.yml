@@ -1,0 +1,11 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build custom Supabase image
+        run: docker build -t togo/supabase-postgres:ci ./image
+      - name: Validate compose
+        run: docker compose -f docker-compose.yml config >/dev/null
