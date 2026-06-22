@@ -1,0 +1,26 @@
+# togo Supabase CLI config. `supabase start` brings up the local stack; point the
+# db at the togo custom image (build it first: see image/Dockerfile) so ParadeDB /
+# pgvector / pg_partman are available locally.
+project_id = "togo"
+
+[db]
+port = 54322
+major_version = 15
+
+# To use the custom image with `supabase start`, build & tag it then set:
+#   docker build -t togo/supabase-postgres:local ./image
+# and reference it via the experimental image override or run the self-hosted
+# compose in ./docker-compose.yml (full control over the db image).
+
+[studio]
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://localhost:8080"
+
+[storage]
+enabled = true
+
+[realtime]
+enabled = true

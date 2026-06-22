@@ -1,0 +1,61 @@
+# Self-hosted Supabase stack using the togo custom Postgres image (ParadeDB /
+# pgvector / pg_partman ready). Use this when you want full control of the db
+# image; otherwise `supabase start` (CLI) reads ./supabase/config.toml.
+#
+#   docker build -t togo/supabase-postgres:local ./image
+#   docker compose up -d
+#
+# togo dev wires this up automatically when SUPABASE_LOCAL=compose.
+services:
+  db:
+    build: ./image
+    image: togo/supabase-postgres:local
+    restart: unless-stopped
+    ports: ["54322:5432"]
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth:
+    image: supabase/gotrue:v2.158.1
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+    environment:
+      GOTRUE_DB_DRIVER: postgres
+      DATABASE_URL: postgres://supabase_auth_admin:${POSTGRES_PASSWORD:-postgres}@db:5432/postgres
+      GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:8080}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters}
+
+  rest:
+    image: postgrest/postgrest:v12.2.0
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD:-postgres}@db:5432/postgres
+      PGRST_JWT_SECRET: ${JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters}
+    ports: ["54324:3000"]
+
+  storage:
+    image: supabase/storage-api:v1.11.13
+    depends_on:
+      db: { condition: service_healthy }
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://supabase_storage_admin:${POSTGRES_PASSWORD:-postgres}@db:5432/postgres
+      FILE_SIZE_LIMIT: 52428800
+      STORAGE_BACKEND: file
+    volumes:
+      - storage-data:/var/lib/storage
+
+volumes:
+  db-data:
+  storage-data:
