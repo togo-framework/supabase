@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/assets/togo-mark.svg" width="96" alt="togo"></p>
+
 # supabase
 
 togo's full Supabase integration: a **custom Postgres image** (Supabase base +
@@ -24,3 +26,15 @@ togo install togo-framework/supabase
 - storage-supabase — Supabase Storage (planned).
 
 > The custom image requires a Docker build (CI / your machine); it is not built in this repo's Go toolchain.
+
+---
+
+## 💎 Premium sponsors
+
+togo is proudly sponsored by **ID8 Media** and **One Studio**.
+
+<p align="center">
+  <a href="https://id8media.com"><img src=".github/assets/id8media.svg" height="44" alt="ID8 Media" /></a>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <a href="https://one-studio.co"><img src=".github/assets/one-studio.jpeg" height="44" alt="One Studio" /></a>
+</p>
